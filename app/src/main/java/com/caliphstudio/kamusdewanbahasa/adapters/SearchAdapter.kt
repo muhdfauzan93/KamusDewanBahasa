@@ -1,27 +1,20 @@
 package com.caliphstudio.kamusdewanbahasa.adapters
 
-import android.content.ContentValues.TAG
 import android.content.Context
 import android.content.Intent
-import android.support.v7.widget.CardView
 import android.support.v7.widget.RecyclerView
 import android.text.Html
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
 import android.widget.TextView
 import com.balysv.materialripple.MaterialRippleLayout
 import com.caliphstudio.kamusdewanbahasa.R
 import com.caliphstudio.kamusdewanbahasa.activities.Details
 import com.caliphstudio.kamusdewanbahasa.models.KamusDewan
-import java.util.ArrayList
+import java.util.*
 
-/**
- * Created by MuhdFauzan on 11/25/2017.
- */
-class SearchAdapter (val myContext: Context, private val meaning: ArrayList<KamusDewan>): RecyclerView.Adapter<SearchAdapter.MyViewHolder>() {
+class SearchAdapter (myContext: Context, meaning: ArrayList<KamusDewan>): RecyclerView.Adapter<SearchAdapter.MyViewHolder>() {
 
     private var meaningList: List<KamusDewan>? = null
     private var context:Context ?= null
@@ -39,7 +32,9 @@ class SearchAdapter (val myContext: Context, private val meaning: ArrayList<Kamu
 
     override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
         val meaning = meaningList!![position]
+        @Suppress("DEPRECATION")
         holder.title.text = Html.fromHtml(meaning.tajuk)
+        @Suppress("DEPRECATION")
         holder.desc.text = Html.fromHtml(meaning.maksud)
         holder.edition.text = meaning.edisi
 

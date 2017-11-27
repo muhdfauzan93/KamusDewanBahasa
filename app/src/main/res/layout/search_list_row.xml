@@ -10,7 +10,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="4dp"
-        android:elevation="4dp">
+        android:elevation="4dp"
+        tools:targetApi="lollipop">
 
         <com.balysv.materialripple.MaterialRippleLayout
             android:id="@+id/ripple_search_response"

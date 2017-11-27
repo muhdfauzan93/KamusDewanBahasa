@@ -1,6 +1,9 @@
 package com.caliphstudio.kamusdewanbahasa.models
 
 import com.google.gson.annotations.SerializedName
+import io.realm.RealmObject
+import io.realm.annotations.PrimaryKey
+
 
 data class Result(
 
@@ -9,9 +12,6 @@ data class Result(
 
         @SerializedName("success")
         val success:Int
-
-
-
 )
 
 data class KamusDewan(
@@ -24,3 +24,12 @@ data class KamusDewan(
         @SerializedName("edisi")
         val edisi:String
 )
+
+open class BookmarkModel : RealmObject(){
+
+    @PrimaryKey
+    lateinit var id:String
+    lateinit var title:String
+    lateinit var content:String
+    lateinit var edition:String
+}

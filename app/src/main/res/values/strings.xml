@@ -1,3 +1,10 @@
 <resources>
     <string name="app_name">Kamus Dewan Bahasa</string>
+    <string name="bookmark">Bookmark</string>
+    <string name="bookmarks">Bookmarks</string>
+    <string name="delete_all">Bookmarks</string>
+    <string name="cari">Cari</string>
+    <string name="app_logo">App Logo</string>
+    <string name="penanda_buku">Penanda Buku</string>
+
 </resources>

@@ -1,16 +1,21 @@
+@file:Suppress("DEPRECATION")
+
 package com.caliphstudio.kamusdewanbahasa.activities
 
 import android.app.ProgressDialog
-import android.support.v7.app.AppCompatActivity
+import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
+import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
-import android.view.View
-import com.caliphstudio.kamusdewanbahasa.Config
+import android.text.Html
+import android.view.Menu
+import android.view.MenuItem
+import android.widget.Toast
 import com.caliphstudio.kamusdewanbahasa.R
 import com.caliphstudio.kamusdewanbahasa.adapters.SearchAdapter
-import com.caliphstudio.kamusdewanbahasa.api.APIInterface
 import com.caliphstudio.kamusdewanbahasa.api.APIClient
+import com.caliphstudio.kamusdewanbahasa.api.APIInterface
 import com.caliphstudio.kamusdewanbahasa.models.KamusDewan
 import com.caliphstudio.kamusdewanbahasa.models.Result
 import kotlinx.android.synthetic.main.activity_main.*
@@ -21,9 +26,6 @@ import org.jetbrains.anko.toast
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import android.widget.Toast
-
-
 
 
 class MainActivity : AppCompatActivity(), AnkoLogger {
@@ -35,6 +37,12 @@ class MainActivity : AppCompatActivity(), AnkoLogger {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        supportActionBar!!.setDisplayShowHomeEnabled(true)
+        supportActionBar!!.setDisplayUseLogoEnabled(true)
+        supportActionBar!!.setLogo(R.mipmap.ic_launcher)
+        @Suppress("DEPRECATION")
+        supportActionBar!!.title = Html.fromHtml("<medium>"+getString(R.string.app_name)+"</medium>")
+
         searchAdapter = SearchAdapter(this,searchList)
         recycler_view.adapter = searchAdapter
 
@@ -42,12 +50,11 @@ class MainActivity : AppCompatActivity(), AnkoLogger {
         recycler_view.layoutManager = layoutManager
         recycler_view.setHasFixedSize(true)
 
-        toast(this.packageName)
+
 
         btn_search.setOnClickListener {
             val searchKey = et_search.text.toString().trim()
             if (searchKey.isNotEmpty()){
-                searchList.clear()
                 searchAdapter.notifyDataSetChanged()
                 checkWord(searchKey)
             }
@@ -56,20 +63,28 @@ class MainActivity : AppCompatActivity(), AnkoLogger {
             }
         }
 
+        swipe_layout.setOnRefreshListener {
+            val searchKey = et_search.text.toString().trim()
+            swipe_layout.isRefreshing = true
+            checkWord(searchKey)
+            swipe_layout.isRefreshing = false
+        }
+
 
 
     }
 
     private fun checkWord(key:String){
-
+        searchList.clear()
         val apiInterface = APIClient.getClient().create(APIInterface::class.java)
-        val call = apiInterface.checkWord(key);
+        val call = apiInterface.checkWord(key)
 
         val checkURL = call.request().url().toString()
         error { checkURL }
 
-        val progressDialog = ProgressDialog.show(this, "Muat turun ...",  "Semak istilah ...", true);
-        progressDialog.setCancelable(true);
+        @Suppress("DEPRECATION")
+        val progressDialog = ProgressDialog.show(this, "Muat turun ...",  "Semak istilah ...", true)
+        progressDialog.setCancelable(true)
 
         call.enqueue(object : Callback<Result> {
             override fun onResponse(call: Call<Result>?, response: Response<Result>?) {
@@ -89,15 +104,13 @@ class MainActivity : AppCompatActivity(), AnkoLogger {
 
                 progressDialog.dismiss()
                 error(t!!.message)
-                longToast(t.message.toString())
-
             }
 
         })
 
     }
 
-    var doubleBackToExitPressedOnce = false
+    private var doubleBackToExitPressedOnce = false
 
     override fun onBackPressed() {
         if (doubleBackToExitPressedOnce) {
@@ -108,6 +121,25 @@ class MainActivity : AppCompatActivity(), AnkoLogger {
         this.doubleBackToExitPressedOnce = true
         Toast.makeText(this, "Please click BACK again to exit", Toast.LENGTH_SHORT).show()
 
-        Handler().postDelayed(Runnable { doubleBackToExitPressedOnce = false }, 2000)
+        Handler().postDelayed({ doubleBackToExitPressedOnce = false }, 2000)
     }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.main_menu,menu)
+        return super.onCreateOptionsMenu(menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+
+        if (item != null) {
+            when(item.itemId){
+                R.id.bookmarks->{
+                    startActivity(Intent(this,Bookmarks::class.java))
+                }
+            }
+        }
+        return super.onOptionsItemSelected(item)
+    }
+
+
 }
