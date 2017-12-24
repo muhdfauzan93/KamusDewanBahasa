@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:tool="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical">
+
+    <android.support.v7.widget.CardView
+        android:id="@+id/cv_search"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="4dp"
+        android:elevation="4dp"
+        tools:targetApi="lollipop">
+
+        <com.balysv.materialripple.MaterialRippleLayout
+            android:id="@+id/ripple_history"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="16dp">
+
+                <LinearLayout
+                    android:layout_toLeftOf="@+id/btn_del_hist"
+                    android:id="@+id/ll_key"
+                    android:orientation="vertical"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_toStartOf="@+id/btn_del_hist">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:id="@+id/tv_search_key"
+                        tools:text="Title"
+                        android:ellipsize="end"
+                        android:maxLines="2"
+                        android:textAppearance="?android:textAppearanceSmall"/>
+
+                </LinearLayout>
+
+                <ImageButton
+                    android:id="@+id/btn_del_hist"
+                    android:background="@null"
+                    android:src="@drawable/ic_cancel_black_24dp"
+                    android:layout_marginTop="6dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentTop="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_alignParentEnd="true"
+                    android:contentDescription="Del History Image Button" />
+            </RelativeLayout>
+        </com.balysv.materialripple.MaterialRippleLayout>
+    </android.support.v7.widget.CardView>
+</LinearLayout>

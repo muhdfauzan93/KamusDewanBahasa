@@ -33,3 +33,20 @@ open class BookmarkModel : RealmObject(){
     lateinit var content:String
     lateinit var edition:String
 }
+
+open class SearchHistory : RealmObject(){
+
+    @PrimaryKey
+    lateinit var searchWord:String
+}
+
+data class History(
+        val word:String
+)
+
+open class SwitchToggle : RealmObject(){
+
+    @PrimaryKey
+    var id:Int = 0
+    var switchStatus:Boolean = false
+}

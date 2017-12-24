@@ -1,5 +1,6 @@
 package com.caliphstudio.kamusdewanbahasa.activities
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.text.Html
@@ -23,7 +24,7 @@ class Details : AppCompatActivity(), AnkoLogger {
     // Open the realm for the UI thread.
     //creating  database oject
     private val realm = Realm.getDefaultInstance()
-
+    @Suppress("DEPRECATION")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_details)
@@ -33,27 +34,22 @@ class Details : AppCompatActivity(), AnkoLogger {
         supportActionBar!!.setLogo(R.mipmap.ic_launcher)
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
 
-
         val b:Bundle=intent.extras
 
+        tajuk = Html.fromHtml(b.getString("tajuk")).toString()
+        //capitalize the first letter of a String
+        val convertString = tajuk.substring(0,1).toUpperCase() + tajuk.substring(1).toLowerCase()
+        maksud = Html.fromHtml(b.getString("maksud")).toString()
+        edisi = b.getString("edisi").toString()
+        supportActionBar!!.title = Html.fromHtml("<strong><small>$convertString</small></strong>")
+        setMeaning(tajuk, maksud,edisi)
 
-        if (b!=null){
-            @Suppress("DEPRECATION")
-            tajuk = Html.fromHtml(b.getString("tajuk")).toString().toUpperCase()
-            @Suppress("DEPRECATION")
-            maksud = Html.fromHtml(b.getString("maksud")).toString()
-            edisi = b.getString("edisi").toString()
-            @Suppress("DEPRECATION")
-            supportActionBar!!.title = Html.fromHtml("<medium>$tajuk</medium>")
-            setMeaning(tajuk, maksud,edisi)
-
-        }else
-            finish()
 
     }
 
+    @SuppressLint("SetTextI18n")
     private fun setMeaning(tajuk:String, maksud:String, edisi:String){
-        tv_tittle.text = tajuk
+        tv_tittle.text = tajuk.substring(0,1).toUpperCase() + tajuk.substring(1).toLowerCase()
         tv_content.text = maksud
         tv_edition.text = edisi
 

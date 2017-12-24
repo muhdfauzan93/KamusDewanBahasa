@@ -35,7 +35,7 @@ class Bookmarks : AppCompatActivity(), AnkoLogger {
         supportActionBar!!.setLogo(R.mipmap.ic_launcher)
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
         @Suppress("DEPRECATION")
-        supportActionBar!!.title = Html.fromHtml("<medium>"+getString(R.string.penanda_buku)+"</medium>")
+        supportActionBar!!.title = Html.fromHtml("<strong><small>"+getString(R.string.penanda_buku)+"</small></strong>")
 
         searchAdapter = SearchAdapter(this,bookmarkList)
         recycler_view.adapter = searchAdapter
@@ -52,7 +52,7 @@ class Bookmarks : AppCompatActivity(), AnkoLogger {
 
         bookmarkList.clear()
         val results = realm.where(BookmarkModel::class.java).findAll()
-        if (results!!.load()) {
+        if (results.isNotEmpty()) {
             for (i in results) {
                 val test = KamusDewan(i.title,i.content,i.edition)
                 bookmarkList.add(test)
@@ -71,7 +71,6 @@ class Bookmarks : AppCompatActivity(), AnkoLogger {
 
 
     override fun onResume() {
-        error { "onResume" }
         super.onResume()
         crud()
     }
@@ -108,7 +107,7 @@ class Bookmarks : AppCompatActivity(), AnkoLogger {
                                 item.isEnabled = false
                                 crud()
                             } catch (ex: Exception) {
-                                throw ex
+                                error { ex.message.toString() }
                             }
                         }
                         negativeButton("Batal") {

@@ -1,10 +1,14 @@
-<resources>
-    <string name="app_name">Kamus Dewan Bahasa</string>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="app_name">Kamus Dewan</string>
     <string name="bookmark">Bookmark</string>
     <string name="bookmarks">Bookmarks</string>
     <string name="delete_all">Bookmarks</string>
     <string name="cari">Cari</string>
     <string name="app_logo">App Logo</string>
-    <string name="penanda_buku">Penanda Buku</string>
-
+    <string name="penanda_buku" tools:keep="@string/penanda_buku">Penanda Buku</string>
+    <string name="hint_cari_istilah">Cari istilah</string>
+    <string name="simpan_carian">Simpan Carian</string>
+    <string name="semak">Semak</string>
+    <string name="sila_masukkan_teks">Sila masukkan teks</string>
+    <string name="sejarah_carian">Sejarah Carian</string>
 </resources>

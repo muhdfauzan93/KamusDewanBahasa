@@ -2,7 +2,6 @@
 
 package com.caliphstudio.kamusdewanbahasa.activities
 
-import android.app.ProgressDialog
 import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
@@ -12,26 +11,29 @@ import android.text.Html
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
+import com.caliphstudio.kamusdewanbahasa.HistoryInterface
 import com.caliphstudio.kamusdewanbahasa.R
-import com.caliphstudio.kamusdewanbahasa.adapters.SearchAdapter
-import com.caliphstudio.kamusdewanbahasa.api.APIClient
-import com.caliphstudio.kamusdewanbahasa.api.APIInterface
-import com.caliphstudio.kamusdewanbahasa.models.KamusDewan
-import com.caliphstudio.kamusdewanbahasa.models.Result
+import com.caliphstudio.kamusdewanbahasa.adapters.HistoryAdapter
+import com.caliphstudio.kamusdewanbahasa.models.History
+import com.caliphstudio.kamusdewanbahasa.models.SearchHistory
+import com.caliphstudio.kamusdewanbahasa.models.SwitchToggle
+import io.realm.Realm
 import kotlinx.android.synthetic.main.activity_main.*
 import org.jetbrains.anko.AnkoLogger
+import org.jetbrains.anko.alert
 import org.jetbrains.anko.error
-import org.jetbrains.anko.longToast
 import org.jetbrains.anko.toast
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 
 
-class MainActivity : AppCompatActivity(), AnkoLogger {
+class MainActivity : AppCompatActivity(), AnkoLogger, HistoryInterface {
 
-    private lateinit var searchAdapter: SearchAdapter
-    private var searchList = ArrayList<KamusDewan>()
+
+    private lateinit var myAdapter: HistoryAdapter
+    private var historyList = ArrayList<History>()
+
+    // Open the realm for the UI thread.
+    //creating  database oject
+    private val realm = Realm.getDefaultInstance()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -41,73 +43,122 @@ class MainActivity : AppCompatActivity(), AnkoLogger {
         supportActionBar!!.setDisplayUseLogoEnabled(true)
         supportActionBar!!.setLogo(R.mipmap.ic_launcher)
         @Suppress("DEPRECATION")
-        supportActionBar!!.title = Html.fromHtml("<medium>"+getString(R.string.app_name)+"</medium>")
+        supportActionBar!!.title = Html.fromHtml("<strong><small>"+getString(R.string.app_name)+"</small></strong>")
 
-        searchAdapter = SearchAdapter(this,searchList)
-        recycler_view.adapter = searchAdapter
+        myAdapter = HistoryAdapter(this,historyList)
+        history_recycler.adapter = myAdapter
 
         val layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL,false)
-        recycler_view.layoutManager = layoutManager
-        recycler_view.setHasFixedSize(true)
+        history_recycler.layoutManager = layoutManager
+        history_recycler.setHasFixedSize(true)
+        layoutManager.reverseLayout = true
+        layoutManager.stackFromEnd = true
 
+        getSearchHistory()
+        checkHistorySwitch()
 
+        history_switch.setOnCheckedChangeListener { button, b ->
 
-        btn_search.setOnClickListener {
-            val searchKey = et_search.text.toString().trim()
+            setSwitch(b)
+            if (b){
+                toast("Button is on")
+            }
+            else
+                toast("Button is off")
+        }
+        btn_semak.setOnClickListener {
+            val searchKey = et_search_text.text.toString().trim()
             if (searchKey.isNotEmpty()){
-                searchAdapter.notifyDataSetChanged()
-                checkWord(searchKey)
+                myAdapter.notifyDataSetChanged()
+                addSearchHistory(searchKey.toLowerCase())
+                val intent = Intent(this,Search::class.java)
+                intent.putExtra("searchText", searchKey)
+                startActivity(intent)
             }
             else{
                 toast("Sila masukkan istilah untuk carian")
             }
         }
 
-        swipe_layout.setOnRefreshListener {
-            val searchKey = et_search.text.toString().trim()
-            swipe_layout.isRefreshing = true
-            checkWord(searchKey)
-            swipe_layout.isRefreshing = false
+        btn_clear_history.setOnClickListener {
+            removeAllSearchHistory()
         }
-
-
 
     }
 
-    private fun checkWord(key:String){
-        searchList.clear()
-        val apiInterface = APIClient.getClient().create(APIInterface::class.java)
-        val call = apiInterface.checkWord(key)
+    private fun checkHistorySwitch(){
 
-        val checkURL = call.request().url().toString()
-        error { checkURL }
+        val isSwitchSet = realm.where(SwitchToggle::class.java).equalTo("id",1.toInt()).findFirst()
+        if (isSwitchSet==null) {
+            realm.executeTransaction {
+                val switch = realm.createObject(SwitchToggle::class.java,1)
+                switch.switchStatus = false
+                !history_switch.isChecked
+            }
+        } else{
+            history_switch.isChecked = isSwitchSet.switchStatus
+        }
 
-        @Suppress("DEPRECATION")
-        val progressDialog = ProgressDialog.show(this, "Muat turun ...",  "Semak istilah ...", true)
-        progressDialog.setCancelable(true)
+    }
 
-        call.enqueue(object : Callback<Result> {
-            override fun onResponse(call: Call<Result>?, response: Response<Result>?) {
-                val result: Result = response!!.body()!!
-                if (result.success == 1) {
-                    searchList.addAll(result.KamusDewan)
-                    error { searchList.size.toString() }
+    private fun setSwitch(status: Boolean){
+        realm.executeTransaction {
+            val isSwitchSet = realm.where(SwitchToggle::class.java).equalTo("id",1.toInt()).findFirst()
+            isSwitchSet!!.switchStatus = status
+        }
 
-                } else{
-                    longToast("Carian istilah tiada di dalam kamus terkini.")
+    }
+
+    override fun addSearchHistory(keyword: String) {
+        if (history_switch.isChecked) {
+            val isSave = realm.where(SearchHistory::class.java).equalTo("searchWord", keyword.toString()).findFirst()
+            if (isSave == null) {
+                realm.executeTransaction {
+                    realm.createObject(SearchHistory::class.java, keyword)
                 }
-                searchAdapter.notifyDataSetChanged()
-                progressDialog.dismiss()
+                //toast("Keyword added")
+
             }
+        }
+    }
 
-            override fun onFailure(call: Call<Result>?, t: Throwable?) {
-
-                progressDialog.dismiss()
-                error(t!!.message)
+    override fun getSearchHistory() {
+        btn_clear_history.isClickable = false
+        historyList.clear()
+        val checkHistory = realm.where(SearchHistory::class.java).findAll()
+        if (checkHistory.isNotEmpty()){
+            for (i in checkHistory){
+                historyList.add(History(i.searchWord))
             }
+            btn_clear_history.isClickable = true
+        }
+        myAdapter.notifyDataSetChanged()
+    }
 
-        })
+    override fun removeSearchHistory(keyword: String) {
+        val removeHistory = realm.where(SearchHistory::class.java).equalTo("searchWord", keyword.toString()).findAll()
+        if (removeHistory.isNotEmpty()) {
+            realm.executeTransaction {
+                removeHistory.deleteAllFromRealm()
+            }
+        }
+    }
 
+    private fun removeAllSearchHistory(){
+        alert("Adakah anda ingin memadamkan semua sejarah carian?","Padam Sejarah Carian") {
+            positiveButton("Ya") {
+                try {
+                    realm.executeTransaction {
+                        realm.delete(SearchHistory::class.java)
+                    }
+                    getSearchHistory()
+                } catch (ex: Exception) {
+                    error { ex.message.toString() }
+                }
+            }
+            negativeButton("Batal") {
+            }
+        }.show()
     }
 
     private var doubleBackToExitPressedOnce = false
@@ -141,5 +192,14 @@ class MainActivity : AppCompatActivity(), AnkoLogger {
         return super.onOptionsItemSelected(item)
     }
 
+    override fun onResume() {
+        super.onResume()
+        getSearchHistory()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        realm.close()
+    }
 
 }
