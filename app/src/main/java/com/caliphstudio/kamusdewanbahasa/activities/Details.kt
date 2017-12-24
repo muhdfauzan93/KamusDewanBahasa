@@ -21,6 +21,7 @@ class Details : AppCompatActivity(), AnkoLogger {
     private lateinit var maksud:String
     private lateinit var edisi:String
 
+
     // Open the realm for the UI thread.
     //creating  database oject
     private val realm = Realm.getDefaultInstance()
@@ -43,8 +44,6 @@ class Details : AppCompatActivity(), AnkoLogger {
         edisi = b.getString("edisi").toString()
         supportActionBar!!.title = Html.fromHtml("<strong><small>$convertString</small></strong>")
         setMeaning(tajuk, maksud,edisi)
-
-
     }
 
     @SuppressLint("SetTextI18n")
@@ -54,25 +53,21 @@ class Details : AppCompatActivity(), AnkoLogger {
         tv_edition.text = edisi
 
         id = (tajuk+edisi).replace(" ", "")
-
-
     }
 
     private fun isBookmark(id:String):Boolean{
         val isBookmark = realm.where(BookmarkModel::class.java).equalTo("id", id).findAll()
-
         if (isBookmark.isEmpty())
             return false
 
     return true
     }
 
-    private fun bookmark(id:String,title:String,content:String,edition:String):Boolean{
+    private fun setBookmark(id: String, title: String, content: String, edition: String): Boolean {
         val isBookmark = realm.where(BookmarkModel::class.java).equalTo("id", id).findAll()
-
-        if (isBookmark.isEmpty()){
+        if (isBookmark.isEmpty()) {
             realm.executeTransaction {
-                val bookmark = realm.createObject(BookmarkModel::class.java,id)
+                val bookmark = realm.createObject(BookmarkModel::class.java, id)
                 bookmark.title = title
                 bookmark.content = content
                 bookmark.edition = edition
@@ -81,8 +76,7 @@ class Details : AppCompatActivity(), AnkoLogger {
 
             }
             return true
-        }
-        else {
+        } else {
             realm.executeTransaction {
                 isBookmark.deleteAllFromRealm()
                 toast("Penanda buku telah dipadam")
@@ -119,7 +113,7 @@ class Details : AppCompatActivity(), AnkoLogger {
         if (item != null) {
             when(item.itemId){
                 R.id.bookmark->{
-                    if (bookmark(id,tajuk,maksud,edisi))
+                    if (setBookmark(id,tajuk,maksud,edisi))
                         item.setIcon(R.drawable.ic_turned_in_white_48dp)
                     else
                         item.setIcon(R.drawable.ic_turned_in_not_white_48dp)

@@ -18,7 +18,6 @@ import org.jetbrains.anko.error
 
 
 class Bookmarks : AppCompatActivity(), AnkoLogger {
-
     private lateinit var searchAdapter: SearchAdapter
     private var bookmarkList = ArrayList<KamusDewan>()
 
@@ -45,11 +44,24 @@ class Bookmarks : AppCompatActivity(), AnkoLogger {
         recycler_view.setHasFixedSize(true)
         layoutManager.reverseLayout = true
         layoutManager.stackFromEnd = true
-        crud()
+        getBookmark()
     }
 
-    private fun crud(){
+    override fun onResume() {
+        super.onResume()
+        getBookmark()
+    }
 
+    private fun checkBookmark(): Boolean {
+        val results = realm.where(BookmarkModel::class.java).findAll()
+        if (results.isEmpty()){
+            return false
+        }
+        return true
+    }
+
+
+    private fun getBookmark() {
         bookmarkList.clear()
         val results = realm.where(BookmarkModel::class.java).findAll()
         if (results.isNotEmpty()) {
@@ -61,19 +73,6 @@ class Bookmarks : AppCompatActivity(), AnkoLogger {
         searchAdapter.notifyDataSetChanged()
     }
 
-    private fun checkBookmark():Boolean{
-        val results = realm.where(BookmarkModel::class.java).findAll()
-        if (results.isEmpty()){
-            return false
-        }
-        return true
-    }
-
-
-    override fun onResume() {
-        super.onResume()
-        crud()
-    }
 
     override fun onDestroy() {
         super.onDestroy()
@@ -105,7 +104,7 @@ class Bookmarks : AppCompatActivity(), AnkoLogger {
                                     realm.delete(BookmarkModel::class.java)
                                 }
                                 item.isEnabled = false
-                                crud()
+                                getBookmark()
                             } catch (ex: Exception) {
                                 error { ex.message.toString() }
                             }

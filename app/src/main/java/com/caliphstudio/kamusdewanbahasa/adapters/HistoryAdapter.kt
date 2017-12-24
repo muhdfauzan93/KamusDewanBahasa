@@ -9,16 +9,16 @@ import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.TextView
 import com.balysv.materialripple.MaterialRippleLayout
-import com.caliphstudio.kamusdewanbahasa.HistoryInterface
 import com.caliphstudio.kamusdewanbahasa.R
 import com.caliphstudio.kamusdewanbahasa.activities.Search
+import com.caliphstudio.kamusdewanbahasa.interfaces.HistoryInterface
 import com.caliphstudio.kamusdewanbahasa.models.History
 
 class HistoryAdapter (myContext: Context, history: ArrayList<History>): RecyclerView.Adapter<HistoryAdapter.MyViewHolder>() {
 
     private var context:Context ?= null
     private var historyList:ArrayList<History>
-    private var myInterface:HistoryInterface = myContext as HistoryInterface
+    private var myInterface: HistoryInterface = myContext as HistoryInterface
 
     init {
         this.context = myContext

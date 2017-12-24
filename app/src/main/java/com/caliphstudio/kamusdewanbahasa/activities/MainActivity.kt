@@ -11,9 +11,9 @@ import android.text.Html
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
-import com.caliphstudio.kamusdewanbahasa.HistoryInterface
 import com.caliphstudio.kamusdewanbahasa.R
 import com.caliphstudio.kamusdewanbahasa.adapters.HistoryAdapter
+import com.caliphstudio.kamusdewanbahasa.interfaces.HistoryInterface
 import com.caliphstudio.kamusdewanbahasa.models.History
 import com.caliphstudio.kamusdewanbahasa.models.SearchHistory
 import com.caliphstudio.kamusdewanbahasa.models.SwitchToggle

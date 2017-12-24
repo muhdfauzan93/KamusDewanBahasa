@@ -1,4 +1,4 @@
-package com.caliphstudio.kamusdewanbahasa
+package com.caliphstudio.kamusdewanbahasa.interfaces
 
 interface HistoryInterface {
 
